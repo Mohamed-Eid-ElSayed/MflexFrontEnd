@@ -46,8 +46,9 @@ export default function Login() {
           }
         );
         if (response.status === 200) {
-          localStorage.setItem("UserData", JSON.stringify(response.data));
-          localStorage.setItem("noToken", "true");
+          // backend returns { user, token }
+          localStorage.setItem("UserData", JSON.stringify(response.data.user));
+          localStorage.setItem("token", response.data.token);
           setIsLogin(true);
           navigate("/");
         }

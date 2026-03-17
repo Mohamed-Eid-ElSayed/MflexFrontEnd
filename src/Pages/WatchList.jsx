@@ -2,6 +2,7 @@ import React, { useState, useEffect, Suspense, lazy } from "react";
 import { useTmdbAPI } from "../Store/API";
 import MovieCardFallback from "../Components/MovieCardFallback";
 import Loader from "../Components/Loader";
+import { authClient } from "../utils/authClient";
 
 const backendURL = import.meta.env.VITE_BACKEND_SERVICE_URL || "http://localhost:5000";
 
@@ -16,11 +17,14 @@ export default function Watchlist() {
     if (!userData?._id) return;
     const getUserReactions = async () => {
       try {
-        const response = await fetch(
-          `${backendURL}/api/user/getfavoritesandwatchlist/${userData._id}`,
-          { credentials: "include" }
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.error("Missing token: user must be logged in.");
+          return;
+        }
+        const { data } = await authClient.get(
+          `/api/user/getfavoritesandwatchlist/${userData._id}`
         );
-        const data = await response.json();
         setUserReactions(data);
       } catch (err) {
         console.error(err);

@@ -8,6 +8,7 @@ import { useTmdbAPI } from "../Store/API";
 import MovieCast from "../Components/MovieCast";
 import axios from "axios";
 import MovieRecommendations from "./MoviesRecommendations";
+import { authClient } from "../utils/authClient";
 
 const MovieTrailer = ({ setShowTrailer }) => {
   const { movieId } = useParams();
@@ -97,9 +98,14 @@ export default function MovieInfo() {
   }, [userReactions.isMovieLiked,userReactions.isPartOfWatchlist,movieId]);
   const AddFavourite = async () => {
     try {
-      const response = await axios.post(
-        `${backendURL}/api/user/addtofavorites/${userData._id}/${movieId}`, {},
-        { withCredentials: true }
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Missing token: user must be logged in.");
+        return;
+      }
+      const response = await authClient.post(
+        `/api/user/addtofavorites/${userData._id}/${movieId}`,
+        {},
       );
       if (response.status === 200) {
         const favMovies = JSON.parse(localStorage.getItem("favMovies")) || [];
@@ -124,9 +130,14 @@ export default function MovieInfo() {
   
   const addToWatchlist = async () => {
     try {
-      const response = await axios.post(
-      `${backendURL}/api/user/addtowatchlist/${userData._id}/${movieId}`, {},
-        { withCredentials: true }
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Missing token: user must be logged in.");
+        return;
+      }
+      const response = await authClient.post(
+        `/api/user/addtowatchlist/${userData._id}/${movieId}`,
+        {},
       );
       if (response.status === 200) {
         const partOfWatchlist = JSON.parse(localStorage.getItem("watchlistMovies")) || [];

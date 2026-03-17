@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { authClient } from "../utils/authClient";
 
 const backendURL = import.meta.env.VITE_BACKEND_SERVICE_URL || "http://localhost:5000";
 
@@ -76,6 +77,13 @@ export default function Profile() {
       setSuccessMsg("");
       setLoading(true);
       try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setErrorMsg("You are not logged in. Please sign in again.");
+          setLoading(false);
+          return;
+        }
+
         const payload = {};
         if (values.username !== (userData?.username ?? "")) payload.username = values.username.trim();
         if (values.email !== (userData?.email ?? "")) payload.email = values.email.trim();
@@ -88,13 +96,9 @@ export default function Profile() {
           return;
         }
 
-        const response = await axios.post(
-          `${backendURL}/api/user/update/${userData._id}`,
+        const response = await authClient.post(
+          `/api/user/update/${userData._id}`,
           payload,
-          {
-            headers: { "Content-Type": "application/json" },
-            withCredentials: true,
-          }
         );
         if (response.status === 200) {
           setSuccessMsg("Profile updated successfully.");
@@ -137,7 +141,7 @@ export default function Profile() {
 
   const handleLogOut = () => {
     localStorage.removeItem("UserData");
-    localStorage.removeItem("noToken");
+    localStorage.removeItem("token");
     localStorage.removeItem("favMovies");
     localStorage.removeItem("watchlistMovies");
     setIsLogin(false);
@@ -147,9 +151,12 @@ export default function Profile() {
   const deleteUser = async () => {
     setErrorMsg("");
     try {
-      await axios.delete(`${backendURL}/api/user/delete/${userData._id}`, {
-        withCredentials: true,
-      });
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setErrorMsg("You are not logged in. Please sign in again.");
+        return;
+      }
+      await authClient.delete(`/api/user/delete/${userData._id}`);
       localStorage.clear();
       setIsLogin(false);
       navigate("/sign-up");

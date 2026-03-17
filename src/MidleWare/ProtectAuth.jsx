@@ -6,7 +6,7 @@ export default function ProtectAuth() {
   const location = useLocation();
   const {isLogin, setIsLogin } = useTmdbAPI();
   useEffect(() => {
-    const storedToken = localStorage.getItem("noToken");
+    const storedToken = localStorage.getItem("token");
     if (storedToken) {
       setIsLogin(true);  
     } else {
@@ -26,7 +26,7 @@ export function ProtectLoginAuth() {
   const { token, isLogin, setIsLogin } = useTmdbAPI();
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("noToken");
+    const storedToken = localStorage.getItem("token");
     if (storedToken) {
       setIsLogin(true);
     } else {

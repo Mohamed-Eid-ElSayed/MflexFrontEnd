@@ -11,8 +11,8 @@ export const TembProvider = ({ children }) => {
   const [userData, setUserData] = useState(() =>
     JSON.parse(localStorage.getItem("UserData")),
   );
-  const token = localStorage.getItem("noToken");
-  const [isLogin, setIsLogin] = useState(true);
+  const token = localStorage.getItem("token");
+  const [isLogin, setIsLogin] = useState(Boolean(token));
   const apiClient = axios.create({
     baseURL: baseApi,
     headers: {
