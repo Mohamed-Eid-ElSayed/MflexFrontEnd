@@ -12,18 +12,18 @@ import { authClient } from "../utils/authClient";
 const MovieTrailer = ({ setShowTrailer }) => {
   const { movieId } = useParams();
   const [dataTrailer, setDataTrailer] = useState(null);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const { tembApi } = useTmdbAPI();
 
-   
   useEffect(() => {
     const fetchMovieTrailer = async () => {
       setLoading(true);
-      const result = await tembApi.getMovieTrailer(movieId);
-      if (result) {
-        setDataTrailer(result);
+      try {
+        const result = await tembApi.getMovieTrailer(movieId);
+        if (result) setDataTrailer(result);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchMovieTrailer();
   }, [movieId]);
@@ -32,31 +32,28 @@ const MovieTrailer = ({ setShowTrailer }) => {
     ? dataTrailer.results.find((t) => t.site === "YouTube" && t.type === "Trailer")?.key
     : undefined;
 
-  if (loading) return <Loader title="loading Trailer..." />
+  if (loading) return <Loader title="Loading Trailer..." />;
 
   return (
-      <div className="fixed top-0 left-0 w-full h-screen flex justify-center items-center bg-gradient-to-r from-black/90 to-black/90 backdrop-blur-xl">
-          {                
-              <div className="w-full flex flex-col justify-center items-center ">
-                  <FaTimes
-                      className="p-1 text-black font-bold rounded-full text-3xl bg-white mb-3 cursor-pointer"
-                      onClick={() => {
-                          setShowTrailer(false);
-                      }}
-                  />
-                  {
-                      trailerKey ? (
-                          <iframe src={`https://www.youtube.com/embed/${trailerKey}`} className="w-[300px] h-[200px] sm:w-[400px] sm:h-[300px] md:w-[700px] md:h-[500px]" ></iframe>
-                      ) : (
-                          <div className="text-white text-2xl mt-5">Trailer Not Found</div>
-                      )
-                  }
-              </div>
-          }
-          
+    <div className="fixed inset-0 z-50 flex justify-center items-center bg-black/90 backdrop-blur-xl">
+      <div className="w-full flex flex-col justify-center items-center px-4">
+        <FaTimes
+          className="p-1 text-black font-bold rounded-full text-3xl bg-white mb-3 cursor-pointer"
+          onClick={() => setShowTrailer(false)}
+        />
+        {trailerKey ? (
+          <iframe
+            src={`https://www.youtube.com/embed/${trailerKey}`}
+            className="w-full max-w-[300px] h-[200px] sm:max-w-[500px] sm:h-[300px] md:max-w-[750px] md:h-[500px]"
+          />
+        ) : (
+          <div className="text-white text-2xl mt-5">Trailer Not Found</div>
+        )}
       </div>
-  )
-}
+    </div>
+  );
+};
+
 const MoviePlayer = ({ setShowMovie }) => {
   const { movieId } = useParams();
   const [movieData, setMovieData] = useState(null);
@@ -66,9 +63,12 @@ const MoviePlayer = ({ setShowMovie }) => {
   useEffect(() => {
     const fetchMovieDetail = async () => {
       setLoading(true);
-      const result = await tembApi.getMovieDetail(movieId);
-      setMovieData(result);
-      setLoading(false);
+      try {
+        const result = await tembApi.getMovieDetail(movieId);
+        setMovieData(result);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchMovieDetail();
   }, [movieId]);
@@ -76,35 +76,29 @@ const MoviePlayer = ({ setShowMovie }) => {
   if (loading || !movieData) return <Loader title="Loading Movie..." />;
 
   return (
-    <div className="fixed top-0 left-0 w-full h-screen flex justify-center items-center bg-gradient-to-r from-black/90 to-black/90 backdrop-blur-xl z-50">
+    <div className="fixed inset-0 z-50 flex justify-center items-center bg-black/90 backdrop-blur-xl">
       <div className="w-full flex flex-col justify-center items-center px-4">
-        {/* Close Button */}
         <FaTimes
           className="p-1 text-black font-bold rounded-full text-3xl bg-white mb-3 cursor-pointer"
           onClick={() => setShowMovie(false)}
         />
-
-        {/* Movie Embed Player */}
         <iframe
-          src={movieData.playLink} // playLink من tembApiMovie أو MovieDetail
-          className="w-[300px] h-[200px] sm:w-[400px] sm:h-[300px] md:w-[700px] md:h-[500px] lg:w-[900px] lg:h-[600px]"
+          src={movieData.playLink}
+          className="w-full max-w-[300px] h-[200px] sm:max-w-[500px] sm:h-[300px] md:max-w-[750px] md:h-[500px] lg:max-w-[950px] lg:h-[600px]"
           allow="autoplay; fullscreen"
           frameBorder="0"
           allowFullScreen
           title={movieData.title || "Movie Player"}
-        ></iframe>
-
-        {/* Movie Info */}
+        />
         <div className="text-white mt-4 text-center">
-          <h2 className="text-2xl font-bold">{movieData.title}</h2>
-          <p className="mt-2 text-sm sm:text-base">{movieData.overview}</p>
+          <h2 className="text-xl font-bold">{movieData.title}</h2>
         </div>
       </div>
     </div>
   );
 };
-export default function MovieInfo() {
 
+export default function MovieInfo() {
   const { movieId } = useParams();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
@@ -117,39 +111,33 @@ export default function MovieInfo() {
     isPartOfWatchlist: false,
   });
 
-  // Fetch Movie Details
   useEffect(() => {
     const fetchMovieDetail = async () => {
       setLoading(true);
-      const result = await tembApi.getMovieDetail(movieId);
-      if (result) {
-        setData(result);
+      try {
+        const result = await tembApi.getMovieDetail(movieId);
+        if (result) setData(result);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchMovieDetail();
   }, [movieId]);
 
-  // Post Fav
   useEffect(() => {
-    const favMovies = userData?.favoriteMovies && JSON.parse(localStorage.getItem("favMovies")) || [];
-    const partOfWatchlist = userData?.watchlist && JSON.parse(localStorage.getItem("watchlistMovies")) || [];
+    const favMovies = JSON.parse(localStorage.getItem("favMovies")) || [];
+    const watchlist = JSON.parse(localStorage.getItem("watchlistMovies")) || [];
     setUserReactions({
-        isMovieLiked: favMovies.includes(movieId),
-        isPartOfWatchlist: partOfWatchlist.includes(movieId),
-      });
+      isMovieLiked: favMovies.includes(movieId),
+      isPartOfWatchlist: watchlist.includes(movieId),
+    });
   }, [movieId]);
+
   const AddFavourite = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
-        console.error("Missing token: user must be logged in.");
-        return;
-      }
-      const response = await authClient.post(
-        `/api/user/addtofavorites/${userData._id}/${movieId}`,
-        {},
-      );
+      if (!token) return;
+      const response = await authClient.post(`/api/user/addtofavorites/${userData._id}/${movieId}`, {});
       if (response.status === 200) {
         const favMovies = JSON.parse(localStorage.getItem("favMovies")) || [];
         if (!favMovies.includes(movieId)) {
@@ -160,119 +148,102 @@ export default function MovieInfo() {
       }
       if (response.data.isLiked === false) {
         const favMovies = JSON.parse(localStorage.getItem("favMovies")) || [];
-        const updatedFavs = favMovies.filter((id)=> id != movieId)
-        localStorage.setItem("favMovies", JSON.stringify(updatedFavs));
+        localStorage.setItem("favMovies", JSON.stringify(favMovies.filter((id) => id != movieId)));
         setUserReactions((prev) => ({ ...prev, isMovieLiked: false }));
       }
-      
     } catch (error) {
       console.error("Error adding to favorites", error);
     }
   };
 
-  
   const addToWatchlist = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
-        console.error("Missing token: user must be logged in.");
-        return;
-      }
-      const response = await authClient.post(
-        `/api/user/addtowatchlist/${userData._id}/${movieId}`,
-        {},
-      );
+      if (!token) return;
+      const response = await authClient.post(`/api/user/addtowatchlist/${userData._id}/${movieId}`, {});
       if (response.status === 200) {
-        const partOfWatchlist = JSON.parse(localStorage.getItem("watchlistMovies")) || [];
-        if (!partOfWatchlist.includes(movieId)) {
-            partOfWatchlist.push(movieId);
-          localStorage.setItem("watchlistMovies", JSON.stringify(partOfWatchlist));
+        const watchlist = JSON.parse(localStorage.getItem("watchlistMovies")) || [];
+        if (!watchlist.includes(movieId)) {
+          watchlist.push(movieId);
+          localStorage.setItem("watchlistMovies", JSON.stringify(watchlist));
         }
         setUserReactions((prev) => ({ ...prev, isPartOfWatchlist: true }));
       }
       if (response.data.partOfWatchlist === false) {
-        const partOfWatchlist = JSON.parse(localStorage.getItem("watchlistMovies")) || [];
-        const updatedpartOfWatchlist= partOfWatchlist.filter((id)=> id != movieId)
-        localStorage.setItem("watchlistMovies", JSON.stringify(updatedpartOfWatchlist));
+        const watchlist = JSON.parse(localStorage.getItem("watchlistMovies")) || [];
+        localStorage.setItem("watchlistMovies", JSON.stringify(watchlist.filter((id) => id != movieId)));
         setUserReactions((prev) => ({ ...prev, isPartOfWatchlist: false }));
       }
-      
     } catch (error) {
-      console.error("Error adding to favorites", error);
+      console.error("Error adding to watchlist", error);
     }
   };
 
-
-  if (loading || !data) {
-    return <Loader />;
-  }
+  if (loading || !data) return <Loader />;
 
   return (
-    <div className="w-full pb-5 absolute top-0 left-0">
-      {/* Background Image */}
+    // ✅ شيلنا absolute وخلناها relative عشان الفوتر ميطلعش فوقيها
+    <div className="w-full pb-5">
+      {/* Background Hero */}
       <div
-        className={`bg-[url("https://image.tmdb.org/t/p/original${data?.backdrop_path}")] bg-cover bg-center w-full`}
+        className="bg-cover bg-center w-full"
+        style={{ backgroundImage: `url("https://image.tmdb.org/t/p/original${data?.backdrop_path}")` }}
       >
-        <div className="bg-gradient-to-r from-black/60 to-black/60 z-10 w-full flex flex-col items-center space-y-4 py-10 px-3 md:space-x-4 md:space-y-0 md:px-8 md:flex-row">
-          {/* Movie Poster */}
-          <div className="max-w-[200px] md:max-w-[300px] h-auto">
+        <div className="bg-black/60 w-full flex flex-col items-center gap-6 py-8 px-4 md:gap-0 md:space-x-6 md:px-8 md:flex-row md:items-start">
+          
+          {/* Poster */}
+          <div className="w-[160px] sm:w-[200px] md:w-[220px] shrink-0">
             <img
-              src={
-                imgLoading
-                  ? black
-                  : `https://image.tmdb.org/t/p/original${data?.poster_path}`
-              }
+              src={imgLoading ? black : `https://image.tmdb.org/t/p/w500${data?.poster_path}`}
               alt={data?.original_title}
-              className={`w-full ${
-                imgLoading ? "h-[450px]" : "h-auto"
-              } rounded-lg`}
+              className={`w-full rounded-lg ${imgLoading ? "h-[240px]" : "h-auto"}`}
               onLoad={() => setImgLoading(false)}
             />
           </div>
 
-          {/* Movie Details */}
+          {/* Details */}
           <div className="flex-1 text-center md:text-left">
-            <h1 className="text-3xl font-semibold text-white">
+            {/* Title */}
+            <h1 className="text-2xl sm:text-3xl font-semibold text-white leading-tight">
               {data?.original_title}{" "}
-              <span className="text-lightGray2">
+              <span className="text-lightGray2 text-xl">
                 ({data?.release_date?.split("-")[0]})
               </span>
             </h1>
 
-            <div className="flex flex-wrap items-center justify-center md:justify-start space-x-2 text-white">
+            {/* Meta */}
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-white text-sm mt-2">
               <span>{data?.release_date}</span>
-              {data?.production_countries.length > 0 && (
-                <>
-                  <span>({data?.production_countries[0]?.iso_3166_1})</span>
-                  <div className="h-[4px] w-[4px] rounded-full bg-white"></div>
-                </>
+              {data?.production_countries?.length > 0 && (
+                <span>({data.production_countries[0]?.iso_3166_1})</span>
               )}
-              <p>
-                {data?.genres.map((genre, i) =>
-                  i === data?.genres.length - 1 ? genre.name : `${genre.name}, `
+              <span className="h-[4px] w-[4px] rounded-full bg-white inline-block" />
+              <span>
+                {data?.genres?.map((g, i) =>
+                  i === data.genres.length - 1 ? g.name : `${g.name}, `
                 )}
-              </p>
-              <div className="h-[4px] w-[4px] rounded-full bg-white"></div>
+              </span>
+              <span className="h-[4px] w-[4px] rounded-full bg-white inline-block" />
               <span>{data?.runtime} min</span>
             </div>
 
             {/* Buttons */}
-            <div className="flex items-center justify-center md:justify-start space-x-3 my-4">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 my-4">
               <button
-                className="flex items-center bg-mainorange px-3 py-1 rounded-lg text-white"
+                className="flex items-center gap-1 bg-mainorange px-4 py-2 rounded-lg text-white text-sm font-medium"
                 onClick={() => setShowTrailer(true)}
               >
                 <BsFillPlayFill /> Play Trailer
               </button>
               <button
-                className="flex items-center bg-mainorange px-3 py-1 rounded-lg text-white"
+                className="flex items-center gap-1 bg-mainorange px-4 py-2 rounded-lg text-white text-sm font-medium"
                 onClick={() => setShowMovie(true)}
               >
                 <BsFillPlayFill /> Play Movie
               </button>
               <button
                 onClick={AddFavourite}
-                className={`p-3 rounded-full bg-secondaryGray ${
+                className={`p-3 rounded-full bg-secondaryGray transition-colors ${
                   userReactions.isMovieLiked ? "text-red-500" : "text-white"
                 }`}
               >
@@ -280,10 +251,8 @@ export default function MovieInfo() {
               </button>
               <button
                 onClick={addToWatchlist}
-                className={`p-3 rounded-full bg-secondaryGray ${
-                  userReactions.isPartOfWatchlist
-                    ? "text-green-700"
-                    : "text-white"
+                className={`p-3 rounded-full bg-secondaryGray transition-colors ${
+                  userReactions.isPartOfWatchlist ? "text-green-500" : "text-white"
                 }`}
               >
                 <FaBookmark />
@@ -292,13 +261,13 @@ export default function MovieInfo() {
 
             {/* Tagline */}
             {data?.tagline && (
-              <p className="text-lightGray2 italic mb-3">"{data?.tagline}"</p>
+              <p className="text-lightGray2 italic mb-3 text-sm">"{data.tagline}"</p>
             )}
 
             {/* Overview */}
             <div>
-              <h2 className="font-bold text-xl text-white mb-2">Overview</h2>
-              <p className="text-white text-sm md:text-base">
+              <h2 className="font-bold text-lg text-white mb-2">Overview</h2>
+              <p className="text-white text-sm md:text-base leading-relaxed">
                 {data?.overview}
               </p>
             </div>
@@ -306,34 +275,21 @@ export default function MovieInfo() {
         </div>
       </div>
 
-      {/* Cast and Recommendations */}
-      <div className="w-full px-2">
-        <div className="flex items-start flex-col-reverse h-auto sm:flex-row">
-          <div className="w-full sm:w-3/4 flex-1">
-            {/* Movie Cast */}
-            <div>
-              <h2 className="text-white text-3xl">Cast</h2>
-              <MovieCast movieId={movieId} />
-            </div>
-
-            {/* Movie Recommendations */}
-            <div className="mt-10">
-              <h2 className="text-white text-3xl mb-2">Recommendations</h2>
-              <MovieRecommendations movieId={movieId} />
-            </div>
-          </div>
+      {/* Cast & Recommendations */}
+      <div className="w-full px-3 mt-4">
+        <div>
+          <h2 className="text-white text-2xl sm:text-3xl mb-2">Cast</h2>
+          <MovieCast movieId={movieId} />
+        </div>
+        <div className="mt-10">
+          <h2 className="text-white text-2xl sm:text-3xl mb-2">Recommendations</h2>
+          <MovieRecommendations movieId={movieId} />
         </div>
       </div>
 
-      {/* Movie Trailer Popup */}
-      {showTrailer && (
-        <MovieTrailer setShowTrailer={setShowTrailer} />
-      )}
-
-      {/* Movie Player Popup */}
-      {showMovie && (
-        <MoviePlayer setShowMovie={setShowMovie} />
-      )}
+      {/* Popups */}
+      {showTrailer && <MovieTrailer setShowTrailer={setShowTrailer} />}
+      {showMovie && <MoviePlayer setShowMovie={setShowMovie} />}
     </div>
   );
-} 
+}
