@@ -27,9 +27,9 @@ function Layout() {
         </header>
         <div className="px-5 h-[calc(100vh-57px)] hide-scrollbar relative">
           <main><Outlet /></main>
-          <Footer />
         </div>
       </div>
+          <Footer />
     </div>
   );
 }
