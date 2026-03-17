@@ -1,10 +1,10 @@
 import { logo } from "../assets/index";
 import { Link } from "react-router-dom";
 import { useTmdbAPI } from "../Store/API";
+import { BiSearch } from "react-icons/bi";
 
 const Header = () => {
-  const { token } = useTmdbAPI();
-  const userData = JSON.parse(localStorage.getItem("UserData"));
+  const { token, userData } = useTmdbAPI();
 
   return (
     <div className="w-full flex justify-between items-center px-3 py-2 bg-secondaryGray border-b border-lightGray1">
@@ -16,7 +16,13 @@ const Header = () => {
           </span>
         </div>
       </Link>
-      <div className="mr-7 sm:mr-0">
+
+      <div className="flex items-center space-x-3 mr-7 sm:mr-0">
+        {/* Search icon - mobile/tablet only */}
+        <Link to="/movieSearch" className="sm:hidden text-gray-400 hover:text-mainorange">
+          <BiSearch className="h-6 w-6" />
+        </Link>
+
         {!token ? (
           <div className="flex space-x-2">
             <Link
