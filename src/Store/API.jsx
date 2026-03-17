@@ -50,6 +50,19 @@ export const TembProvider = ({ children }) => {
     },
   });
   const tembApi = {
+      getMovie: async () => {
+        try {
+          const { data } = await apiClient.get("/movie/popular");
+          const moviesWithPlayLink = data.results.map((movie) => ({
+            ...movie,
+            playLink: `https://vidsrc.cc/v2/embed/movie/${movie.id}?autoPlay=false`,
+          }));
+          return moviesWithPlayLink;
+        } catch (error) {
+          console.error("Error fetching popular movies:", error);
+          return null;
+        }
+      },
     getUpCommingMovies: async (params) => {
       try {
         const { data } = await apiClient.get("/movie/upcoming", { params });
@@ -131,7 +144,10 @@ export const TembProvider = ({ children }) => {
         const { data } = await apiClient.get(
           `/movie/${movieId}?language=en-US`,
         );
-        return data;
+        return {
+          ...data,
+          playLink: `https://vidsrc.cc/v2/embed/movie/${movieId}?autoPlay=false`,
+        };
       } catch (error) {
         console.error("Error fetching movie detail:", error);
         return null;
