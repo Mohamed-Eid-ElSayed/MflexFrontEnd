@@ -14,7 +14,6 @@ function Layout() {
         <Sidebar mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       </aside>
 
-      {/* Overlay - لما الـ sidebar مفتوحة اضغط بره تتقفل */}
       {mobileMenuOpen && (
         <div
           className="fixed inset-0 z-[5] sm:hidden"
