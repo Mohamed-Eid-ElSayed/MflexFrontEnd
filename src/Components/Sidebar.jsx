@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { NavLink } from "react-router-dom"
 import { HiStar, HiOutlineMenu } from "react-icons/hi"
 import { BiSolidCameraMovie, BiSolidHome, BiSearch } from "react-icons/bi"
@@ -19,29 +18,25 @@ const links = [
   { name: "Github", to: "https://github.com/MoHamed-Eid-bawloo/MO_FLEX", icon: AiFillGithub },
 ]
 
-const NavLinks = ({ handleClick }) => {
-  return (
-    <div>
-      {links.map((link) => (
-        <NavLink
-          key={link.name}
-          to={link.to}
-          onClick={handleClick}
-          className={({ isActive }) =>
-            `flex items-center justify-start text-sm font-medium my-5 text-gray-400 hover:text-mainorange ${isActive ? "text-mainorange" : ""}`
-          }
-        >
-          <link.icon className="h-5 w-5 mr-2" />
-          {link.name}
-        </NavLink>
-      ))}
-    </div>
-  )
-}
+const NavLinks = ({ handleClick }) => (
+  <div>
+    {links.map((link) => (
+      <NavLink
+        key={link.name}
+        to={link.to}
+        onClick={handleClick}
+        className={({ isActive }) =>
+          `flex items-center justify-start text-sm font-medium my-5 text-gray-400 hover:text-mainorange ${isActive ? "text-mainorange" : ""}`
+        }
+      >
+        <link.icon className="h-5 w-5 mr-2" />
+        {link.name}
+      </NavLink>
+    ))}
+  </div>
+)
 
-const Sidebar = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+const Sidebar = ({ mobileMenuOpen, setMobileMenuOpen }) => {
   return (
     <>
       {/* Desktop Sidebar */}
@@ -51,15 +46,15 @@ const Sidebar = () => {
       </div>
 
       {/* Mobile toggle button */}
-      <div className="absolute sm:hidden block right-2 top-2 md:right-3 md:top-4">
+      <div className="absolute sm:hidden block right-2 top-2 md:right-3 md:top-4 z-20">
         {mobileMenuOpen
-          ? <RiCloseLine className="w-6 h-6 text-white" onClick={() => setMobileMenuOpen(false)} />
-          : <HiOutlineMenu className="w-6 h-6 text-white" onClick={() => setMobileMenuOpen(true)} />
+          ? <RiCloseLine className="w-6 h-6 text-white cursor-pointer" onClick={() => setMobileMenuOpen(false)} />
+          : <HiOutlineMenu className="w-6 h-6 text-white cursor-pointer" onClick={() => setMobileMenuOpen(true)} />
         }
       </div>
 
       {/* Mobile Sidebar drawer */}
-      <div className={`absolute h-screen top-0 w-2/3 flex flex-col items-start justify-between px-4 py-5 bg-primaryGray/90 z-10 backdrop-blur-xl smooth-transition sm:hidden ${mobileMenuOpen ? "left-0" : "-left-full"}`}>
+      <div className={`fixed h-screen top-0 w-2/3 flex flex-col items-start justify-between px-4 py-5 bg-primaryGray/90 z-10 backdrop-blur-xl smooth-transition sm:hidden ${mobileMenuOpen ? "left-0" : "-left-full"}`}>
         <NavLinks handleClick={() => setMobileMenuOpen(false)} />
         <DeveloperCardFull />
       </div>
