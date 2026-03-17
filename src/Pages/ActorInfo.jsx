@@ -3,162 +3,169 @@ import { useEffect, useState } from "react";
 import { black } from "../assets";
 import Loader from "../Components/Loader";
 import { useTmdbAPI } from "../Store/API";
+
 const ActorCredits = () => {
   const { actorId } = useParams();
-  const {tembApi} = useTmdbAPI();
-  const [loading, setLoading] = useState();
-  const [movies, setMovies] = useState();
+  const { tembApi } = useTmdbAPI();
+  const [loading, setLoading] = useState(false);
+  const [movies, setMovies] = useState([]);
+
   useEffect(() => {
     const fetchgetActorCredits = async () => {
       setLoading(true);
-      const data = await tembApi.getActorCredits(actorId);
-      if (data && data.cast) {
-        setMovies(data.cast);
+      try {
+        const data = await tembApi.getActorCredits(actorId);
+        if (data?.cast) setMovies(data.cast);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
-
     fetchgetActorCredits();
   }, [actorId]);
-  const [imgLoading, setImgLoading] = useState(true);
-  if (loading) {
-    <Loader />;
-  }
+
+  if (loading) return <Loader />;
 
   return (
-    <div className="w-full flex flex-wrap items-center justify-center gap-1">
-      {movies?.map((movie) => {
-        return (
-          <Link key={movie?.id} to={`/movieInfo/${movie?.id}`}>
-            <div className="flex-none w-[200px] flex flex-col justify-center items-center space-y-1">
-              <img
-                src={
-                  imgLoading
-                    ? black
-                    : `https://image.tmdb.org/t/p/original${movie?.poster_path}`
-                }
-                className="w-full h-[300px] rounded-lg"
-                onLoad={() => {
-                  setImgLoading(false);
-                }}
-                alt=""
-              />
-              <div className="text-lightGray2 font-medium text-sm">
-                {movie?.original_title}
-              </div>
+    <div className="w-full flex flex-wrap items-start justify-center gap-3">
+      {movies.map((movie) => (
+        <Link key={movie?.id} to={`/movieInfo/${movie?.id}`}>
+          <div className="flex-none w-[130px] sm:w-[160px] md:w-[180px] flex flex-col justify-center items-center space-y-1">
+            <img
+              src={
+                movie?.poster_path
+                  ? `https://image.tmdb.org/t/p/w300${movie?.poster_path}`
+                  : black
+              }
+              className="w-full h-[195px] sm:h-[240px] md:h-[270px] rounded-lg object-cover"
+              alt={movie?.original_title}
+            />
+            <div className="text-lightGray2 font-medium text-xs sm:text-sm text-center w-full truncate px-1">
+              {movie?.original_title}
             </div>
-          </Link>
-        );
-      })}
+          </div>
+        </Link>
+      ))}
     </div>
   );
 };
 
 const ActorInfo = () => {
   const { actorId } = useParams();
-  const [loading, setLoading] = useState();
-  const [data, setData] = useState();
-  const {tembApi} = useTmdbAPI();
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
+  const { tembApi } = useTmdbAPI();
+  const [imgLoading, setImgLoading] = useState(true);
 
   useEffect(() => {
     const fetchgetActorDetail = async () => {
       setLoading(true);
-      const data = await tembApi.getActorDetail(actorId);
-      if (data && data) {
-        setData(data);
+      try {
+        const result = await tembApi.getActorDetail(actorId);
+        if (result) setData(result);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
-
     fetchgetActorDetail();
   }, [actorId]);
-  const [imgLoading, setImgLoading] = useState(true);
-  if (loading) {
-     return <Loader />;
-  }
-  const currentYear = new Date();
+
+  if (loading || !data) return <Loader />;
+
+  const currentYear = new Date().getFullYear();
+  const birthYear = data?.birthday?.split("-")[0];
+  const age = birthYear ? currentYear - parseInt(birthYear) : null;
 
   return (
-    <div className="w-full flex flex-col md:flex-row items-start space-x-4 py-4">
-      <div className="w-full md:w-3/12 h-auto flex flex-col justify-center items-center space-x-3 ss:flex-row md:space-x-0 md:flex-col">
+    <div className="w-full flex flex-col md:flex-row items-start gap-6 py-4 px-2 md:px-0">
+
+      {/* Left column - صورة + info */}
+      <div className="w-full md:w-3/12 flex flex-col items-center md:items-start gap-4">
+        {/* صورة الممثل */}
         <img
           src={
             imgLoading
               ? black
-              : `https://image.tmdb.org/t/p/original${data?.profile_path}`
+              : `https://image.tmdb.org/t/p/w500${data?.profile_path}`
           }
-          alt=""
-          className="rounded-lg shadow-lg shadow-black/50 mb-3 w-[300px] flex-1"
-          onLoad={() => {
-            setImgLoading(false);
-          }}
+          alt={data?.name}
+          className="rounded-lg shadow-lg shadow-black/50 w-[220px] sm:w-[260px] md:w-full object-cover"
+          onLoad={() => setImgLoading(false)}
         />
-        <div className="w-full text-center md:text-left flex flex-col justify-center items-center md:items-start">
-          <h1 className="text-white font-semibold text-2xl mb-4">
-            Personal Info
-          </h1>
-          <div className="w-full  flex flex-col justify-center items-center space-y-3 md:justify-start md:items-start">
-            <div className="">
-              <h1 className="text-white font-semibold text-xl">Department</h1>
-              <p className="text-lightGray2 font-medium">
-                {data?.known_for_department}
+
+        {/* Personal Info */}
+        <div className="w-full text-center md:text-left">
+          <h2 className="text-white font-semibold text-xl mb-3">Personal Info</h2>
+          <div className="flex flex-col gap-3">
+
+            <div>
+              <p className="text-white font-semibold text-sm">Known For</p>
+              <p className="text-lightGray2 text-sm">{data?.known_for_department || "N/A"}</p>
+            </div>
+
+            <div>
+              <p className="text-white font-semibold text-sm">Gender</p>
+              <p className="text-lightGray2 text-sm">
+                {data?.gender === 1 ? "Female" : data?.gender === 2 ? "Male" : "N/A"}
               </p>
             </div>
-            <div className="">
-              <h1 className="text-white font-semibold text-xl">Gender</h1>
-              <p className="text-lightGray2 font-medium">
-                {data?.gender == 1 ? "female" : "male"}
-              </p>
-            </div>
-            <div className="">
-              <h1 className="text-white font-semibold text-xl">Birthday</h1>
-              <p className="text-lightGray2 font-medium">
+
+            <div>
+              <p className="text-white font-semibold text-sm">Birthday</p>
+              <p className="text-lightGray2 text-sm">
                 {data?.birthday
-                  ? data?.birthday +
-                    ` (${
-                      currentYear.getFullYear() -
-                      data?.birthday.split("-")[0] +
-                      " years old"
-                    })`
+                  ? `${data.birthday} (${age} years old)`
                   : "Not provided"}
               </p>
             </div>
-            <div className="">
-              <h1 className="text-white font-semibold text-xl">
-                Place of Birth
-              </h1>
-              <p className="text-lightGray2 font-medium">
-                {data?.place_of_birth ? data?.place_of_birth : "Not provided"}
-              </p>
-            </div>
-            <div className="">
-              <h1 className="text-white font-semibold text-xl">Also know As</h1>
-              <p className="text-lightGray2 font-medium">
-                {data?.also_known_as?.map((item) => (
-                  <span key={item}>{item}, </span>
-                ))}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="w-full md:w-3/4">
-        <h1 className="text-white font-bold text-3xl mb-5">{data?.name}</h1>
-        <div className="">
-          <h1 className="text-white font-bold text-2xl mb-3">Biography</h1>
-          <div className="w-full flex flex-col space-x-4">
-            <div className="">
-              <p className="text-lightGray2">{data?.biography}</p>
-            </div>
-            <div className="mt-5">
-              <h1 className="font-bold text-white mb-4 text-2xl">Known for</h1>
-              <div className="w-full flex justify-center items-center">
-                <ActorCredits />
+
+            {data?.deathday && (
+              <div>
+                <p className="text-white font-semibold text-sm">Died</p>
+                <p className="text-lightGray2 text-sm">{data.deathday}</p>
               </div>
+            )}
+
+            <div>
+              <p className="text-white font-semibold text-sm">Place of Birth</p>
+              <p className="text-lightGray2 text-sm">{data?.place_of_birth || "Not provided"}</p>
             </div>
+
+            {data?.also_known_as?.length > 0 && (
+              <div>
+                <p className="text-white font-semibold text-sm">Also Known As</p>
+                <div className="flex flex-col gap-1 mt-1">
+                  {data.also_known_as.map((name) => (
+                    <p key={name} className="text-lightGray2 text-xs">{name}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       </div>
+
+      {/* Right column - اسم + biography + أفلامه */}
+      <div className="w-full md:w-9/12 flex flex-col gap-6">
+        <h1 className="text-white font-bold text-3xl">{data?.name}</h1>
+
+        {/* Biography */}
+        {data?.biography && (
+          <div>
+            <h2 className="text-white font-bold text-xl mb-2">Biography</h2>
+            <p className="text-lightGray2 text-sm sm:text-base leading-relaxed whitespace-pre-line">
+              {data.biography}
+            </p>
+          </div>
+        )}
+
+        {/* Known For */}
+        <div>
+          <h2 className="text-white font-bold text-xl mb-4">Known For</h2>
+          <ActorCredits />
+        </div>
+      </div>
+
     </div>
   );
 };
