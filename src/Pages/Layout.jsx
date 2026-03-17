@@ -27,8 +27,8 @@ function Layout() {
         </header>
         <div className="px-5 h-[calc(100vh-57px)] overflow-y-scroll hide-scrollbar relative">
           <main><Outlet /></main>
-          <Footer />
         </div>
+          <Footer />
       </div>
     </div>
   );
