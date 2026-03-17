@@ -28,6 +28,7 @@ const NavLinks = ({ handleClick }) => {
             <NavLink
               key={link.name}
               to={link.to}
+              onClick={handleClick}
               className={({isActive}) => `flex items-center justify-start text-sm font-medium my-5 text-gray-400 hover:text-mainorange ${ isActive ? "text-mainorange" : ""}`}
             >
               <link.icon className="h-5 w-5 mr-2"  />
