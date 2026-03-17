@@ -5,7 +5,8 @@ import { useFormik } from "formik";
 import axios from "axios";
 import { useTmdbAPI } from "../Store/API";
 
-const backendURL = import.meta.env.VITE_BACKEND_SERVICE_URL || "http://localhost:5000";
+const backendURL =
+  import.meta.env.VITE_BACKEND_SERVICE_URL || "http://localhost:5000";
 
 const validationSchema = yup.object({
   email: yup
@@ -21,7 +22,7 @@ const validationSchema = yup.object({
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const { setIsLogin } = useTmdbAPI();
+  const { setUserData, setToken } = useTmdbAPI();
   const navigate = useNavigate();
 
   const formik = useFormik({
@@ -47,9 +48,8 @@ export default function Login() {
         );
         if (response.status === 200) {
           // backend returns { user, token }
-          localStorage.setItem("UserData", JSON.stringify(response.data.user));
-          localStorage.setItem("token", response.data.token);
-          setIsLogin(true);
+          setUserData(response.data.user);
+          setToken(response.data.token);
           navigate("/");
         }
       } catch (error) {

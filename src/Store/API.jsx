@@ -4,15 +4,45 @@ import { createContext, useContext, useEffect, useState } from "react";
 const tembContext = createContext();
 
 export const TembProvider = ({ children }) => {
-  const backendApi = import.meta.env.VITE_BACKEND_SERVICE_URL || "http://localhost:5000";
+  const backendApi =
+    import.meta.env.VITE_BACKEND_SERVICE_URL || "http://localhost:5000";
   const baseApi = "https://api.themoviedb.org/3";
   const keyApi =
     "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ZDJiMDRlMmJmNWI5ZjYzMzJhOGVkOGFjZGUxZjM0MCIsIm5iZiI6MTcxODQ1OTM1Ny43NDEsInN1YiI6IjY2NmQ5YmRkMmEzMzIwODliYjk5YzZmNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.gOpydioL_OR3ri52sndayWGGMzN9-__8QSkMyOgVqaU";
-  const [userData, setUserData] = useState(() =>
-    JSON.parse(localStorage.getItem("UserData")),
-  );
-  const token = localStorage.getItem("token");
-  const [isLogin, setIsLogin] = useState(Boolean(token));
+  const [userData, setUserData] = useState(() => {
+    const raw = localStorage.getItem("UserData");
+    return raw ? JSON.parse(raw) : null;
+  });
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const isLogin = Boolean(token);
+
+  // Persist auth state to localStorage (prevents "needs refresh" issues)
+  useEffect(() => {
+    if (token) localStorage.setItem("token", token);
+    else localStorage.removeItem("token");
+  }, [token]);
+
+  useEffect(() => {
+    if (userData) localStorage.setItem("UserData", JSON.stringify(userData));
+    else localStorage.removeItem("UserData");
+  }, [userData]);
+
+  // Sync across tabs/windows (optional but helps consistency)
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === "token") setToken(e.newValue);
+      if (e.key === "UserData") setUserData(e.newValue ? JSON.parse(e.newValue) : null);
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  const logout = () => {
+    setUserData(null);
+    setToken(null);
+    localStorage.removeItem("favMovies");
+    localStorage.removeItem("watchlistMovies");
+  };
   const apiClient = axios.create({
     baseURL: baseApi,
     headers: {
@@ -169,8 +199,9 @@ export const TembProvider = ({ children }) => {
         userData,
         token,
         isLogin,
-        setIsLogin,
         setUserData,
+        setToken,
+        logout,
         backendApi,
       }}
     >

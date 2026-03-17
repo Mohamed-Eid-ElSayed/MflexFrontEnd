@@ -3,10 +3,7 @@ import { useTmdbAPI } from "../Store/API";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { authClient } from "../utils/authClient";
-
-const backendURL = import.meta.env.VITE_BACKEND_SERVICE_URL || "http://localhost:5000";
 
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
 const MAX_IMAGE_SIZE_MB = 2;
@@ -34,7 +31,7 @@ function fileToBase64(file) {
 const passwordRules = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
 
 export default function Profile() {
-  const { userData, setIsLogin, setUserData } = useTmdbAPI();
+  const { userData, setUserData, logout } = useTmdbAPI();
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -140,11 +137,7 @@ export default function Profile() {
   };
 
   const handleLogOut = () => {
-    localStorage.removeItem("UserData");
-    localStorage.removeItem("token");
-    localStorage.removeItem("favMovies");
-    localStorage.removeItem("watchlistMovies");
-    setIsLogin(false);
+    logout();
     navigate("/log-in");
   };
 
@@ -158,7 +151,7 @@ export default function Profile() {
       }
       await authClient.delete(`/api/user/delete/${userData._id}`);
       localStorage.clear();
-      setIsLogin(false);
+      logout();
       navigate("/sign-up");
     } catch (error) {
       setErrorMsg(

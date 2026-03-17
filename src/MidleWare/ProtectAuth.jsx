@@ -4,15 +4,7 @@ import { useTmdbAPI } from "../Store/API";
 
 export default function ProtectAuth() {
   const location = useLocation();
-  const {isLogin, setIsLogin } = useTmdbAPI();
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setIsLogin(true);  
-    } else {
-      setIsLogin(false); 
-    }
-  }, []);
+  const { isLogin } = useTmdbAPI();
 
   return isLogin ? (
     <Outlet />
@@ -23,16 +15,7 @@ export default function ProtectAuth() {
 
 export function ProtectLoginAuth() {
   const location = useLocation();
-  const { token, isLogin, setIsLogin } = useTmdbAPI();
-
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setIsLogin(true);
-    } else {
-      setIsLogin(false);
-    }
-  }, []);
+  const { isLogin } = useTmdbAPI();
 
   return isLogin ? (
     <Navigate to="/" state={{ from: location }} replace />

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const backendURL =
-  import.meta.env.VITE_BACKEND_SERVICE_URL || "http://localhost:5000";
+  "https://mflex-back-end.vercel.app" || "http://localhost:5000";
 
 export const authClient = axios.create({
   baseURL: backendURL,

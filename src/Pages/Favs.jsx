@@ -4,7 +4,7 @@ import MovieCardFallback from "../Components/MovieCardFallback";
 import Loader from "../Components/Loader";
 import { authClient } from "../utils/authClient";
 
-const backendURL = import.meta.env.VITE_BACKEND_SERVICE_URL || "http://localhost:5000";
+const backendURL = "https://mflex-back-end.vercel.app" || "http://localhost:5000";
 
 export default function Favs() {
   const [loading, setLoading] = useState(true);

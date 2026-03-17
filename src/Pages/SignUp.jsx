@@ -4,7 +4,7 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import axios from "axios";
 
-const backendURL = import.meta.env.VITE_BACKEND_SERVICE_URL || "http://localhost:5000";
+const backendURL = "https://mflex-back-end.vercel.app" || "http://localhost:5000";
 
 const USERNAME_MIN = 2;
 const USERNAME_MAX = 50;
