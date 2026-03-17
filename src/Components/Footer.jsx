@@ -9,13 +9,7 @@ import { TiGroup } from "react-icons/ti";
 import { logo } from "../assets/index";
 
 const Footer = () => {
-  const links = [
-    { name: "Home", to: "/", icon: BiSolidHome },
-    { name: "Search", to: "/movieSearch", icon: BiSearch },
-    { name: "Popular", to: "/popularMovies", icon: HiStar },
-    { name: "Upcoming", to: "/allUpComMovies", icon: BiSolidCameraMovie },
-    { name: "Actors", to: "/actors", icon: TiGroup },
-  ];
+
 
   return (
     <footer className="w-full bg-secondaryGray border-t border-lightGray1 mt-10">
@@ -42,23 +36,6 @@ const Footer = () => {
               <SiThemoviedatabase className="text-mainorange text-lg mx-1" />
               <span>TMDB</span>
             </div>
-          </div>
-
-          {/* Nav Links */}
-          <div className="flex flex-col items-center md:items-start gap-2">
-            <span className="text-mainorange text-xs font-bold uppercase tracking-widest mb-2">
-              Navigate
-            </span>
-            {links.map((link) => (
-              <Link
-                key={link.name}
-                to={link.to}
-                className="flex items-center gap-2 text-gray-400 hover:text-mainorange text-sm transition-colors duration-200 group"
-              >
-                <link.icon className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
-                {link.name}
-              </Link>
-            ))}
           </div>
 
           {/* Creator card */}
@@ -99,9 +76,6 @@ const Footer = () => {
 
         {/* Bottom bar */}
         <div className="mt-10 pt-5 border-t border-lightGray1/50 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-gray-600 text-xs">
-            © {new Date().getFullYear()} Mo-Flex. All rights reserved.
-          </p>
           <p className="text-gray-600 text-xs flex items-center gap-1">
             Made with <FaHeart className="text-mainorange text-[10px] mx-1 animate-pulse" /> by
             <span className="text-mainorange font-semibold ml-1">Mohamed Eid El.Sayed</span>
