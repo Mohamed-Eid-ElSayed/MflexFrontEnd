@@ -1,7 +1,6 @@
 import React from 'react'
 import UpcomingMovies from '../Components/UpCommingMovies'
 import MoreContent from '../Components/MoreContent'
-import Footer from '../Components/Footer'
 function Home() {
   return (
     <>
@@ -9,7 +8,6 @@ function Home() {
       <UpcomingMovies/>
       <MoreContent/>
     </div>
-      <Footer/>
     </>
   )
 }
