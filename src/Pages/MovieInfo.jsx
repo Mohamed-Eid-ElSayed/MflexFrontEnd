@@ -6,14 +6,13 @@ import { black } from "../assets";
 import Loader from "../Components/Loader";
 import { useTmdbAPI } from "../Store/API";
 import MovieCast from "../Components/MovieCast";
-import axios from "axios";
 import MovieRecommendations from "./MoviesRecommendations";
 import { authClient } from "../utils/authClient";
 
 const MovieTrailer = ({ setShowTrailer }) => {
   const { movieId } = useParams();
   const [dataTrailer, setDataTrailer] = useState(null);
-  const [loading,setLoading] = useState(null)
+  const [loading, setLoading] = useState(false)
   const { tembApi } = useTmdbAPI();
 
    
@@ -58,16 +57,60 @@ const MovieTrailer = ({ setShowTrailer }) => {
       </div>
   )
 }
+const MoviePlayer = ({ setShowMovie }) => {
+  const { movieId } = useParams();
+  const [movieData, setMovieData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const { tembApi } = useTmdbAPI();
 
+  useEffect(() => {
+    const fetchMovieDetail = async () => {
+      setLoading(true);
+      const result = await tembApi.getMovieDetail(movieId);
+      setMovieData(result);
+      setLoading(false);
+    };
+    fetchMovieDetail();
+  }, [movieId]);
+
+  if (loading || !movieData) return <Loader title="Loading Movie..." />;
+
+  return (
+    <div className="fixed top-0 left-0 w-full h-screen flex justify-center items-center bg-gradient-to-r from-black/90 to-black/90 backdrop-blur-xl z-50">
+      <div className="w-full flex flex-col justify-center items-center px-4">
+        {/* Close Button */}
+        <FaTimes
+          className="p-1 text-black font-bold rounded-full text-3xl bg-white mb-3 cursor-pointer"
+          onClick={() => setShowMovie(false)}
+        />
+
+        {/* Movie Embed Player */}
+        <iframe
+          src={movieData.playLink} // playLink من tembApiMovie أو MovieDetail
+          className="w-[300px] h-[200px] sm:w-[400px] sm:h-[300px] md:w-[700px] md:h-[500px] lg:w-[900px] lg:h-[600px]"
+          allow="autoplay; fullscreen"
+          frameBorder="0"
+          allowFullScreen
+          title={movieData.title || "Movie Player"}
+        ></iframe>
+
+        {/* Movie Info */}
+        <div className="text-white mt-4 text-center">
+          <h2 className="text-2xl font-bold">{movieData.title}</h2>
+          <p className="mt-2 text-sm sm:text-base">{movieData.overview}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
 export default function MovieInfo() {
-  const backendURL =
-    import.meta.env.VITE_BACKEND_SERVICE_URL || "http://localhost:5000";
 
   const { movieId } = useParams();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [imgLoading, setImgLoading] = useState(true);
   const [showTrailer, setShowTrailer] = useState(false);
+  const [showMovie, setShowMovie] = useState(false);
   const { tembApi, userData } = useTmdbAPI();
   const [userReactions, setUserReactions] = useState({
     isMovieLiked: false,
@@ -95,7 +138,7 @@ export default function MovieInfo() {
         isMovieLiked: favMovies.includes(movieId),
         isPartOfWatchlist: partOfWatchlist.includes(movieId),
       });
-  }, [userReactions.isMovieLiked,userReactions.isPartOfWatchlist,movieId]);
+  }, [movieId]);
   const AddFavourite = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -113,13 +156,13 @@ export default function MovieInfo() {
           favMovies.push(movieId);
           localStorage.setItem("favMovies", JSON.stringify(favMovies));
         }
-        setUserReactions({ isMovieLiked: true });
+        setUserReactions((prev) => ({ ...prev, isMovieLiked: true }));
       }
       if (response.data.isLiked === false) {
         const favMovies = JSON.parse(localStorage.getItem("favMovies")) || [];
         const updatedFavs = favMovies.filter((id)=> id != movieId)
         localStorage.setItem("favMovies", JSON.stringify(updatedFavs));
-        setUserReactions({ isMovieLiked: false });
+        setUserReactions((prev) => ({ ...prev, isMovieLiked: false }));
       }
       
     } catch (error) {
@@ -145,13 +188,13 @@ export default function MovieInfo() {
             partOfWatchlist.push(movieId);
           localStorage.setItem("watchlistMovies", JSON.stringify(partOfWatchlist));
         }
-        setUserReactions({ isPartOfWatchlist: true });
+        setUserReactions((prev) => ({ ...prev, isPartOfWatchlist: true }));
       }
       if (response.data.partOfWatchlist === false) {
         const partOfWatchlist = JSON.parse(localStorage.getItem("watchlistMovies")) || [];
         const updatedpartOfWatchlist= partOfWatchlist.filter((id)=> id != movieId)
         localStorage.setItem("watchlistMovies", JSON.stringify(updatedpartOfWatchlist));
-        setUserReactions({ isPartOfWatchlist: false });
+        setUserReactions((prev) => ({ ...prev, isPartOfWatchlist: false }));
       }
       
     } catch (error) {
@@ -222,6 +265,12 @@ export default function MovieInfo() {
                 <BsFillPlayFill /> Play Trailer
               </button>
               <button
+                className="flex items-center bg-mainorange px-3 py-1 rounded-lg text-white"
+                onClick={() => setShowMovie(true)}
+              >
+                <BsFillPlayFill /> Play Movie
+              </button>
+              <button
                 onClick={AddFavourite}
                 className={`p-3 rounded-full bg-secondaryGray ${
                   userReactions.isMovieLiked ? "text-red-500" : "text-white"
@@ -278,8 +327,13 @@ export default function MovieInfo() {
 
       {/* Movie Trailer Popup */}
       {showTrailer && (
-        <MovieTrailer movieId={movieId} setShowTrailer={setShowTrailer} />
+        <MovieTrailer setShowTrailer={setShowTrailer} />
+      )}
+
+      {/* Movie Player Popup */}
+      {showMovie && (
+        <MoviePlayer setShowMovie={setShowMovie} />
       )}
     </div>
   );
-}
+} 
