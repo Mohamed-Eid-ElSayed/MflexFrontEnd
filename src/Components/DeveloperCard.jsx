@@ -1,4 +1,4 @@
-import { AiFillGithub } from "react-icons/ai";
+import { FaLinkedin } from "react-icons/fa";
 import { SiThemoviedatabase } from "react-icons/si";
 
 // النسخة الكاملة - للـ Sidebar على الكمبيوتر
@@ -27,13 +27,13 @@ export const DeveloperCardFull = () => (
           <p className="text-gray-500 text-[10px] mt-0.5">Full Stack Developer</p>
         </div>
         <a
-          href="https://github.com/MoHamed-Eid-bawloo/MO_FLEX"
+          href="https://www.linkedin.com/in/mohammad-eid12/"
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-mainorange/30 text-gray-300 hover:text-white text-[10px] px-3 py-1.5 rounded-full transition-all duration-200"
         >
-          <AiFillGithub className="h-3 w-3" />
-          GitHub
+          <FaLinkedin className="h-3 w-3" />
+          LinkedIn
         </a>
       </div>
     </div>
@@ -58,13 +58,13 @@ export const DeveloperCardMini = () => (
           <p className="text-gray-500 text-[11px] mt-0.5">Full Stack Developer</p>
         </div>
         <a
-          href="https://github.com/MoHamed-Eid-bawloo/MO_FLEX"
+          href="https://www.linkedin.com/in/mohammad-eid12/"
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-mainorange/30 text-gray-300 hover:text-white text-xs px-3 py-2 rounded-full transition-all duration-200 shrink-0"
         >
-          <AiFillGithub className="h-4 w-4" />
-          GitHub
+          <FaLinkedin className="h-4 w-4" />
+          LinkedIn
         </a>
       </div>
     </div>
