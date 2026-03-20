@@ -208,7 +208,7 @@ export default function MovieInfo() {
   }
 
   return (
-     <div className="w-full pb-5 absolute left-0">
+     <div className="w-full pb-5">
       {/* Background Image */}
       <div
         className={`bg-[url("https://image.tmdb.org/t/p/original${data?.backdrop_path}")] bg-cover bg-center w-full`}
@@ -336,4 +336,4 @@ export default function MovieInfo() {
       )}
     </div>
   );
-} 
+}
