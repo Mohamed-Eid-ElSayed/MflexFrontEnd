@@ -208,20 +208,24 @@ export default function MovieInfo() {
   }
 
   return (
-    <div className="w-full pb-5 -mx-5">
+    <div className="w-full pb-5">
       {/* Background Image */}
       <div
-        style={{ backgroundImage: `url("https://image.tmdb.org/t/p/w1280${data?.backdrop_path}")` }}
-        className="bg-cover bg-center bg-no-repeat w-full"
+        style={{
+          backgroundImage: `url("https://image.tmdb.org/t/p/w1280${data?.backdrop_path}")`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
       >
-        <div className="bg-gradient-to-r from-black/60 to-black/60 z-10 w-full flex flex-col items-center space-y-4 py-10 px-3 md:space-x-4 md:space-y-0 md:px-8 md:flex-row">
+        <div className="bg-black/60 w-full flex flex-col items-center space-y-4 py-10 px-3 md:space-x-4 md:space-y-0 md:px-8 md:flex-row">
           {/* Movie Poster */}
           <div className="max-w-[200px] md:max-w-[300px] h-auto">
             <img
               src={
                 imgLoading
                   ? black
-                  : `https://image.tmdb.org/t/p/original${data?.poster_path}`
+                  : `https://image.tmdb.org/t/p/w500${data?.poster_path}`
               }
               alt={data?.original_title}
               className={`w-full ${
@@ -258,7 +262,7 @@ export default function MovieInfo() {
             </div>
 
             {/* Buttons */}
-            <div className="flex items-center justify-center md:justify-start space-x-3 my-4">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 my-4">
               <button
                 className="flex items-center bg-mainorange px-3 py-1 rounded-lg text-white"
                 onClick={() => setShowTrailer(true)}
