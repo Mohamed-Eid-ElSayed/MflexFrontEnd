@@ -208,7 +208,7 @@ export default function MovieInfo() {
   }
 
   return (
-    <div className="w-full pb-5">
+    <div className="w-full pb-5 -mx-5">
       {/* Background Image */}
       <div
         style={{ backgroundImage: `url("https://image.tmdb.org/t/p/w1280${data?.backdrop_path}")` }}
