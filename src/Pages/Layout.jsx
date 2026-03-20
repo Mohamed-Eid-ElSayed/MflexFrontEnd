@@ -1,7 +1,7 @@
 import React from "react";
 import Header from "../Components/Header";
 import Sidebar from "../Components/Sidebar";
-import Footer from "../Components/Footer";
+// import Footer from "../Components/Footer";
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
 
@@ -27,7 +27,7 @@ function Layout() {
         </header>
         <div className="px-5 h-[calc(100vh-57px)] overflow-y-scroll hide-scrollbar relative">
           <main><Outlet /></main>
-          <Footer />
+          {/* <Footer /> */}
         </div>
       </div>
     </div>
